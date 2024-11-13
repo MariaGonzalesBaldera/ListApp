@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from 'react';
+import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -12,17 +12,17 @@ import {
   Platform,
   Dimensions,
   Modal,
-} from 'react-native';
+} from "react-native";
 
-import fonts from '../../../../Utils/fonts';
-import colors from '../../../../Utils/colors';
-import {ArrowLeft, ArrowRight} from '../../../../Assets/svg';
-import {useNavigation} from '@react-navigation/native';
+import fonts from "../../../../Utils/fonts";
+import colors from "../../../../Utils/colors";
+import { ArrowLeft, ArrowRight } from "../../../../Assets/svg";
+import { useNavigation } from "@react-navigation/native";
 
-const {width, height} = Dimensions.get('window');
+const { width, height } = Dimensions.get("window");
 
-import SelectComponent from '../../../../Components/select';
-import HeaderUser from '../../../../Components/HeaderUser';
+import SelectComponent from "../../../../Components/select";
+import HeaderUser from "../../../../Components/HeaderUser";
 import {
   UpdateProfile,
   GetPronouns,
@@ -48,16 +48,16 @@ import {
   UpdateSunSingns,
   UpdateEthnicities,
   UpdateEducations,
-} from '../../../../Services/User/UserServices';
-import {ThemeContext} from '../../../../Components/themeContext';
-import MultiSlider from '@ptomasroos/react-native-multi-slider';
-import {Switch, TouchableWithoutFeedback} from 'react-native-gesture-handler';
+} from "../../../../Services/User/UserServices";
+import { ThemeContext } from "../../../../Components/themeContext";
+import MultiSlider from "@ptomasroos/react-native-multi-slider";
+import { Switch, TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 export default function Register() {
   const [stage, setStage] = useState(1); // Estado para controlar la etapa del proceso de registro
   const navigation = useNavigation();
-  const {theme} = useContext(ThemeContext);
-  const [selectedMenu, setSelectedMenu] = useState('basic');
+  const { theme } = useContext(ThemeContext);
+  const [selectedMenu, setSelectedMenu] = useState("basic");
 
   const [pronouns, setPronouns] = useState([]);
   const [genders, setGenders] = useState([]);
@@ -79,6 +79,7 @@ export default function Register() {
   const [smoketobaco, setSmoketobaco] = useState([]);
   const [smokeweed, setSmokeweed] = useState([]);
   const [drugs, setDrugs] = useState([]);
+  const [toInterest, setToInterest] = useState("");
 
   const [user, setUser] = useState([]);
   const [imagesGallery, setImagesGallery] = useState(null);
@@ -87,73 +88,80 @@ export default function Register() {
   const [isSwitchEnabled, setIsSwitchEnabled] = useState(false);
   const [isShareMyLocation, setIsShareMyLocation] = useState(false); // Estado inicial booleano
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const userData = await MeUser();
-      setUser(userData);
-     // console.log('userData', userData);
-    };
-    fetchUser();
-  }, [navigation]);
-
-  // Valores Config Perfil
-  const toggleSwitch = () => {
-    setIsSwitchEnabled(previousState => !previousState);
-    setIsShareMyLocation(previousState => {
-      const newState = !previousState;
-      console.log('switch', newState); // Usamos el nuevo valor directamente aquí
-      return newState;
-    });
-  };
-
   const [formDetails, setFormDetails] = useState({
-    age: '', //
-    height: '', //
-    description: '', //
-    relationship: '',
-    google_id: '',
-    apple_id: '',
-    profile_image: '', //
-    neighborhood: '', //
-    distance_min: '0', //
-    distance_max: '100', //
-    age_min: '0',
-    age_max: '100',
+    age: "", //
+    height: "", //
+    description: "", //
+    relationship: "",
+    google_id: "",
+    apple_id: "",
+    profile_image: "", //
+    neighborhood: "", //
+    distance_min: "0", //
+    distance_max: "100", //
+    age_min: "0",
+    age_max: "100",
     is_share_my_location: isShareMyLocation,
-    want_to_meet: '',
-    work: '', //
-    school: '', //
-    job_name: '', //
-    latitude: '', //
-    longitude: '', //
-    pronouns_id: '', //
-    religions_id: '', //
-    politicals_id: '', //
-    lifestyle_active_id: '', //
-    lifestyle_drink_id: '', //
-    lifestyle_smoke_id: '',
-    lifestyle_tabacco_id: '', //
-    lifestyle_weed_id: '', //
-    lifestyle_drugs_id: '', //
-    lookings_for_id: '', //
-    family_plans_id: '', //
-    genders_id: '', //
-    sex_interests_id: '', //
+    want_to_meet: "",
+    work: "", //
+    school: "", //
+    job_name: "", //
+    latitude: "", //
+    longitude: "", //
+    pronouns_id: "", //
+    religions_id: "", //
+    politicals_id: "", //
+    lifestyle_active_id: "", //
+    lifestyle_drink_id: "", //
+    lifestyle_smoke_id: "",
+    lifestyle_tabacco_id: "", //
+    lifestyle_weed_id: "", //
+    lifestyle_drugs_id: "", //
+    lookings_for_id: "", //
+    family_plans_id: "", //
+    genders_id: "", //
+    sex_interests_id: "", //
 
     prompts: [],
     photos: [],
     list: [],
     lookings: [], // ---
-    education_id: '', //
-    meet: '',
-    looking_for: '', //
-    family_plans: '', //
+    education_id: "", //
+    meet: "",
+    looking_for: "", //
+    family_plans: "", //
     sunsigns: [], //
     ethnicities: [], //
     educations: [], //
   });
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await MeUser();
+      setUser(userData);
+      setToInterest(userData.sex_interests_id)
+    };
+    const unsubscribeFocus = navigation.addListener('focus', () => {
+      console.log('Pantalla enfocada, actualizando usuario...');
+      fetchUser();
+    });
+    fetchUser();
+    return () => {
+      unsubscribeFocus();
+    };
+  }, [navigation]);
+
+  // Valores Config Perfil
+  const toggleSwitch = () => {
+    setIsSwitchEnabled((previousState) => !previousState);
+    setIsShareMyLocation((previousState) => {
+      const newState = !previousState;
+      console.log("switch", newState); // Usamos el nuevo valor directamente aquí
+      return newState;
+    });
+  };
+
   // Verifica si ambos campos están vacíos
-  const disableBtn1 = formDetails.looking_for.trim() === '';
+  const disableBtn1 = formDetails.looking_for.trim() === "";
 
   const [looking, setLookings] = useState([]);
 
@@ -167,7 +175,7 @@ export default function Register() {
   }, []);
 
   const handleOptionPress = (field: any, value: any) => {
-    setFormDetails(prevState => ({
+    setFormDetails((prevState) => ({
       ...prevState,
       [field]: value,
     }));
@@ -187,6 +195,7 @@ export default function Register() {
     };
     const fetchSex = async () => {
       const data = await GetSexInterests();
+      console.log("sex interest ", data);
       setSex(data);
     };
     const fetchLookings = async () => {
@@ -200,169 +209,169 @@ export default function Register() {
     const fetchReligion = async () => {
       try {
         const data = await GetReligions();
-        const transformedOptions = data.map(item => ({
+        const transformedOptions = data.map((item) => ({
           label: item.name,
           value: item.id.toString(),
         }));
         setReligion(transformedOptions);
       } catch (error) {
-        console.error('Error fetching religions:', error);
+        console.error("Error fetching religions:", error);
       }
     };
 
     const fetchPolitical = async () => {
       try {
         const data = await GetPolitical();
-        const transformedOptions = data.map(item => ({
+        const transformedOptions = data.map((item) => ({
           label: item.name,
           value: item.id.toString(),
         }));
         setPolitical(transformedOptions);
       } catch (error) {
-        console.error('Error fetching political views:', error);
+        console.error("Error fetching political views:", error);
       }
     };
 
     const fetchActive = async () => {
       try {
         const data = await GetLifeActive();
-        const transformedOptions = data.map(item => ({
+        const transformedOptions = data.map((item) => ({
           label: item.name,
           value: item.id.toString(),
         }));
         setActive(transformedOptions);
       } catch (error) {
-        console.error('Error fetching life activity:', error);
+        console.error("Error fetching life activity:", error);
       }
     };
 
     const fetchDrink = async () => {
       try {
         const data = await GetLifeDrink();
-        const transformedOptions = data.map(item => ({
+        const transformedOptions = data.map((item) => ({
           label: item.name,
           value: item.id.toString(),
         }));
         setDrink(transformedOptions);
       } catch (error) {
-        console.error('Error fetching drink preferences:', error);
+        console.error("Error fetching drink preferences:", error);
       }
     };
 
     const fetchSmoke = async () => {
       try {
         const data = await GetLifeSmoke();
-        const transformedOptions = data.map(item => ({
+        const transformedOptions = data.map((item) => ({
           label: item.name,
           value: item.id.toString(),
         }));
         setSmoke(transformedOptions);
       } catch (error) {
-        console.error('Error fetching smoke preferences:', error);
+        console.error("Error fetching smoke preferences:", error);
       }
     };
 
     const fetchEducation = async () => {
       try {
         const data = await GetEducation();
-        const transformedOptions = data.map(item => ({
+        const transformedOptions = data.map((item) => ({
           label: item.name,
           value: item.id.toString(),
         }));
         setEducation(transformedOptions);
       } catch (error) {
-        console.error('Error fetching education levels:', error);
+        console.error("Error fetching education levels:", error);
       }
     };
 
     const fetchLookingFor = async () => {
       try {
         const data = await GetLookingfor();
-        const transformedOptions = data.map(item => ({
+        const transformedOptions = data.map((item) => ({
           label: item.name,
           value: item.id.toString(),
         }));
         setLookingfor(transformedOptions);
       } catch (error) {
-        console.error('Error fetching education levels:', error);
+        console.error("Error fetching education levels:", error);
       }
     };
 
     const fetchFamilyplans = async () => {
       try {
         const data = await GetFamilyplans();
-        const transformedOptions = data.map(item => ({
+        const transformedOptions = data.map((item) => ({
           label: item.name,
           value: item.id.toString(),
         }));
         setFamilyplans(transformedOptions);
       } catch (error) {
-        console.error('Error fetching education levels:', error);
+        console.error("Error fetching education levels:", error);
       }
     };
 
     const fetchSunsign = async () => {
       try {
         const data = await GetSunsign();
-        const transformedOptions = data.map(item => ({
+        const transformedOptions = data.map((item) => ({
           label: item.name,
           value: item.id.toString(),
         }));
         setSunsigns(transformedOptions);
       } catch (error) {
-        console.error('Error fetching education levels:', error);
+        console.error("Error fetching education levels:", error);
       }
     };
 
     const fetchEthnicity = async () => {
       try {
         const data = await GetEthnicity();
-        const transformedOptions = data.map(item => ({
+        const transformedOptions = data.map((item) => ({
           label: item.name,
           value: item.id.toString(),
         }));
         setEthnicities(transformedOptions);
       } catch (error) {
-        console.error('Error fetching education levels:', error);
+        console.error("Error fetching education levels:", error);
       }
     };
 
     const fetchTobacco = async () => {
       try {
         const data = await GetLifeTobacco();
-        const transformedOptions = data.map(item => ({
+        const transformedOptions = data.map((item) => ({
           label: item.name,
           value: item.id.toString(),
         }));
         setSmoketobaco(transformedOptions);
       } catch (error) {
-        console.error('Error fetching smoke preferences:', error);
+        console.error("Error fetching smoke preferences:", error);
       }
     };
 
     const fetchWeed = async () => {
       try {
         const data = await GetLifeWeed();
-        const transformedOptions = data.map(item => ({
+        const transformedOptions = data.map((item) => ({
           label: item.name,
           value: item.id.toString(),
         }));
         setSmokeweed(transformedOptions);
       } catch (error) {
-        console.error('Error fetching smoke preferences:', error);
+        console.error("Error fetching smoke preferences:", error);
       }
     };
 
     const fetchDrugs = async () => {
       try {
         const data = await GetLifeDrugs();
-        const transformedOptions = data.map(item => ({
+        const transformedOptions = data.map((item) => ({
           label: item.name,
           value: item.id.toString(),
         }));
         setDrugs(transformedOptions);
       } catch (error) {
-        console.error('Error fetching smoke preferences:', error);
+        console.error("Error fetching smoke preferences:", error);
       }
     };
 
@@ -387,29 +396,28 @@ export default function Register() {
     fetchEthnicity();
   }, []); // El array vacío [] hace que useEffect se ejecute solo una vez cuando el componente se monta.
 
-  const [range, setRange] = useState([ 15, 85]);
+  const [range, setRange] = useState([15, 85]);
   const [rangeold, setRangeold] = useState([15, 85]);
 
   useEffect(() => {
     if (user) {
-      setRangeold([ user.age_min ?? 15,user.age_max ?? 85 ]);
-      setRange([ user.distance_min ?? 15, user.distance_max ?? 85 ]);
+      setRangeold([user.age_min ?? 15, user.age_max ?? 85]);
+      setRange([user.distance_min ?? 15, user.distance_max ?? 85]);
     }
   }, [user]);
 
-  const handleSliderChange = values => {
+  const handleSliderChange = (values) => {
     setRange(values);
-    handleOptionPress('distance_min', values[0]);
-    handleOptionPress('distance_max', values[1]);
+    handleOptionPress("distance_min", values[0]);
+    handleOptionPress("distance_max", values[1]);
   };
 
   const handleSliderChange2 = (values) => {
-    setRangeold(values); 
+    setRangeold(values);
     handleOptionPress("age_min", values[0]);
     handleOptionPress("age_max", values[1]);
   };
   const ValidateForm = async () => {
-
     //RegisterUser(name, last_name, phone, birthdate, email, password)
     const Create = UpdateProfile({
       age: formDetails.age,
@@ -444,30 +452,29 @@ export default function Register() {
       family_plans_id: formDetails.family_plans_id,
       genders_id: formDetails.genders_id,
       sex_interests_id: formDetails.sex_interests_id,
-       
     });
     const UpdateSunSing = UpdateSunSingns([formDetails.sunsigns]);
     const UpdateEthnicity = UpdateEthnicities([formDetails.ethnicities]);
-    const UpdateEducation = UpdateEducations([formDetails.educations]);
+   // const UpdateEducation = UpdateEducations([formDetails.educations]);
 
     if (
       (await Create) === true &&
       (await UpdateSunSing) === true &&
-      (await UpdateEthnicity) === true &&
-      (await UpdateEducation) === true
+      (await UpdateEthnicity) === true
+       //&& (await UpdateEducation) === true
     ) {
-      console.log('EXITO UPDATE');
+      console.log("EXITO UPDATE");
       setAgreeVisible(true);
     }
   };
 
-  
-  const GenericModal = ({visible, onClose, children}: any) => (
+  const GenericModal = ({ visible, onClose, children }: any) => (
     <Modal
       animationType="fade"
       transparent={true}
       visible={visible}
-      onRequestClose={onClose}>
+      onRequestClose={onClose}
+    >
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.modalBackground2}>
           <View style={styles.modalView2}>{children}</View>
@@ -475,9 +482,9 @@ export default function Register() {
       </TouchableWithoutFeedback>
     </Modal>
   );
-  const ModalAgree = ({visible, onClose}: any) => (
+  const ModalAgree = ({ visible, onClose }: any) => (
     <GenericModal visible={visible} onClose={onClose}>
-      <Text style={[styles.modalTitle, fonts.H4, {marginTop: 12}]}>
+      <Text style={[styles.modalTitle, fonts.H4, { marginTop: 12 }]}>
         Your changes were saved successfully
       </Text>
       <View style={styles.horizontalButtonContainer}>
@@ -486,7 +493,8 @@ export default function Register() {
           onPress={() => {
             onClose;
             navigation.goBack();
-          }}>
+          }}
+        >
           <Text style={[styles.buttonText, fonts.Btn]}>Done</Text>
         </TouchableOpacity>
       </View>
@@ -494,21 +502,23 @@ export default function Register() {
   );
 
   const [agreeVisible, setAgreeVisible] = useState(false);
-
+  const selectedInterest = sex.find(
+    (interest) => interest.id === toInterest
+  );
   return (
-    <View style={[styles.container, {backgroundColor: theme.background}]}>
+    <View style={[styles.container, { backgroundColor: theme.background }]}>
       <SafeAreaView />
       <HeaderUser
         text="Edit interest"
         svg={<ArrowLeft color={theme.text} />}
         onPress={() => navigation.goBack()}
       />
-        <ModalAgree
+      <ModalAgree
         visible={agreeVisible}
         onClose={() => setAgreeVisible(false)}
       />
       <ScrollView
-        style={{paddingHorizontal: 20}}
+        style={{ paddingHorizontal: 20 }}
         showsVerticalScrollIndicator={false} // Oculta la barra de desplazamiento vertical
         showsHorizontalScrollIndicator={false} // Oculta la barra de desplazamiento horizontal, si es necesario
       >
@@ -525,68 +535,71 @@ export default function Register() {
           <TouchableOpacity
             style={[
               styles.menuItem,
-              selectedMenu === 'basic' && styles.selectedMenuItem,
+              selectedMenu === "basic" && styles.selectedMenuItem,
             ]}
-            onPress={() => setSelectedMenu('basic')}>
+            onPress={() => setSelectedMenu("basic")}
+          >
             <Text
               style={[
                 styles.menuText,
-                {color: theme.text},
-                selectedMenu === 'basic' && styles.selectedMenuText,
-              ]}>
-              {' '}
-              Basic filters{' '}
+                { color: theme.text },
+                selectedMenu === "basic" && styles.selectedMenuText,
+              ]}
+            >
+              {" "}
+              Basic filters{" "}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[
               styles.menuItem,
-              selectedMenu === 'advanced' && styles.selectedMenuItem,
+              selectedMenu === "advanced" && styles.selectedMenuItem,
             ]}
-            onPress={() => setSelectedMenu('advanced')}>
+            onPress={() => setSelectedMenu("advanced")}
+          >
             <Text
               style={[
                 styles.menuText,
-                {color: theme.text},
-                selectedMenu === 'advanced' && styles.selectedMenuText,
-              ]}>
-              {' '}
-              Advanced filters{' '}
+                { color: theme.text },
+                selectedMenu === "advanced" && styles.selectedMenuText,
+              ]}
+            >
+              {" "}
+              Advanced filters{" "}
             </Text>
           </TouchableOpacity>
         </View>
 
         {/* Lógica para mostrar las opciones de menú seleccionadas */}
-        {selectedMenu === 'basic' ? (
-          <ScrollView style={{marginTop: 20}}>
-            <Text style={[fonts.B1, {color: theme.text}]}>
+        {selectedMenu === "basic" ? (
+          <ScrollView style={{ marginTop: 20 }}>
+            <Text style={[fonts.B1, { color: theme.text }]}>
               Gender of your interest:
             </Text>
             <TouchableOpacity
-              style={{marginTop: 10}}
+              style={{ marginTop: 10 }}
               onPress={() =>
-                navigation.navigate('selection', {
-                  type: 'gender',
+                navigation.navigate("selectionuser", {
+                  type: "gender",
                   //selectedValue: formDetails.sun_sign,
-                  onSelect: [user?.genders] || [],
+                  onSelect: [user?.sex_interests_id] || [],
                 })
-              }>
+              }
+            >
               <View
                 style={[
                   styles.input,
                   {
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
                     backgroundColor: theme.backgroundChat,
                   },
                 ]} // Agregamos justifyContent y alignItems
               >
                 <View>
-                  <Text style={{color: theme.text}}>
-                    {user?.genders && user.genders.name
-                      ? user.genders.name
-                      : 'Select'}
+                  <Text>
+                    {selectedInterest ? selectedInterest.name : "Select"}
                   </Text>
                 </View>
                 <View>
@@ -595,38 +608,42 @@ export default function Register() {
               </View>
             </TouchableOpacity>
 
-            <View style={{marginTop: 16}}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={[fonts.B1, {marginBottom: 10, color: theme.text}]}>
-                  How old are they?{' '}
+            <View style={{ marginTop: 16 }}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text
+                  style={[fonts.B1, { marginBottom: 10, color: theme.text }]}
+                >
+                  How old are they?{" "}
                 </Text>
               </View>
               <View
                 style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
+                  flexDirection: "row",
+                  justifyContent: "space-between",
                   marginTop: 10,
-                  paddingHorizontal: 40
-                }}>
-                <Text style={{color: theme.text}}>{rangeold[0]}</Text>
-                <Text style={{color: theme.text}}>{rangeold[1]}</Text>
+                  paddingHorizontal: 40,
+                }}
+              >
+                <Text style={{ color: theme.text }}>{rangeold[0]}</Text>
+                <Text style={{ color: theme.text }}>{rangeold[1]}</Text>
               </View>
               <View
                 style={{
-                  justifyContent: 'center',
-                  alignContent: 'center',
-                  alignItems: 'center',
-                  width: '100%',
-                }}>
+                  justifyContent: "center",
+                  alignContent: "center",
+                  alignItems: "center",
+                  width: "100%",
+                }}
+              >
                 <MultiSlider
                   key={`age-${rangeold[0]}-${rangeold[1]}`}
                   values={rangeold}
                   min={0}
                   max={100}
                   onValuesChange={handleSliderChange2}
-                  selectedStyle={{backgroundColor: theme.tertiary}}
-                  unselectedStyle={{backgroundColor: '#E0E0E0'}}
-                  trackStyle={{height: 5}}
+                  selectedStyle={{ backgroundColor: theme.tertiary }}
+                  unselectedStyle={{ backgroundColor: "#E0E0E0" }}
+                  trackStyle={{ height: 5 }}
                   sliderLength={300}
                   markerStyle={{
                     height: 20,
@@ -638,10 +655,12 @@ export default function Register() {
               </View>
             </View>
 
-            <View style={{marginVertical: 8}}>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={[fonts.B1, {marginBottom: 10, color: theme.text}]}>
-                  My neighborhood:{' '}
+            <View style={{ marginVertical: 8 }}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text
+                  style={[fonts.B1, { marginBottom: 10, color: theme.text }]}
+                >
+                  My neighborhood:{" "}
                 </Text>
               </View>
 
@@ -655,27 +674,27 @@ export default function Register() {
                   },
                 ]}
                 placeholder={
-                  user?.neighborhood ? user.neighborhood : 'Enter your answer'
+                  user?.neighborhood ? user.neighborhood : "Enter your answer"
                 }
                 placeholderTextColor={theme.textDisable}
                 value={formDetails.neighborhood}
-                onChangeText={text => handleOptionPress('neighborhood', text)}
+                onChangeText={(text) => handleOptionPress("neighborhood", text)}
                 keyboardType="numeric"
               />
               <View style={styles.chatContainer}>
-                <View style={[styles.chatContent, {marginRight: 10}]}>
-                  <Text style={[fonts.B1, {color: theme.text}]}>
+                <View style={[styles.chatContent, { marginRight: 10 }]}>
+                  <Text style={[fonts.B1, { color: theme.text }]}>
                     Share my location
                   </Text>
                 </View>
                 <View style={styles.switchContainer}>
                   <Switch
                     trackColor={{
-                      false: '#767577',
+                      false: "#767577",
                       true: colors.primary.light,
                     }}
                     thumbColor={
-                      isSwitchEnabled ? colors.primary.medium : '#f4f3f4'
+                      isSwitchEnabled ? colors.primary.medium : "#f4f3f4"
                     }
                     ios_backgroundColor={colors.neutral.medium}
                     onValueChange={() => toggleSwitch()}
@@ -685,13 +704,15 @@ export default function Register() {
               </View>
             </View>
 
-            <View style={{marginTop: 8}}>
-              <Text style={[fonts.B2, {marginBottom: 10, color: theme.text}]}>
+            <View style={{ marginTop: 8 }}>
+              <Text style={[fonts.B2, { marginBottom: 10, color: theme.text }]}>
                 Maximum distance:
               </Text>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={[fonts.B1, {marginBottom: 10, color: theme.text}]}>
-                  Range (Miles){' '}
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text
+                  style={[fonts.B1, { marginBottom: 10, color: theme.text }]}
+                >
+                  Range (Miles){" "}
                 </Text>
                 <Text
                   style={[
@@ -700,36 +721,39 @@ export default function Register() {
                       color: colors.secondary.dark,
                       fontSize: 8,
                     },
-                  ]}>
+                  ]}
+                >
                   (Between 0-100)
                 </Text>
               </View>
               <View
                 style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
+                  flexDirection: "row",
+                  justifyContent: "space-between",
                   marginTop: 10,
                   paddingHorizontal: 40,
-                }}>
-                <Text style={{color: theme.text}}>{range[0]}</Text>
-                <Text style={{color: theme.text}}>{range[1]}</Text>
+                }}
+              >
+                <Text style={{ color: theme.text }}>{range[0]}</Text>
+                <Text style={{ color: theme.text }}>{range[1]}</Text>
               </View>
               <View
                 style={{
-                  justifyContent: 'center',
-                  alignContent: 'center',
-                  alignItems: 'center',
-                  width: '100%',
-                }}>
+                  justifyContent: "center",
+                  alignContent: "center",
+                  alignItems: "center",
+                  width: "100%",
+                }}
+              >
                 <MultiSlider
                   key={`distance-${range[0]}-${range[1]}`}
                   values={range}
                   min={0}
                   max={100}
                   onValuesChange={handleSliderChange}
-                  selectedStyle={{backgroundColor: theme.tertiary}}
-                  unselectedStyle={{backgroundColor: '#E0E0E0'}}
-                  trackStyle={{height: 5}}
+                  selectedStyle={{ backgroundColor: theme.tertiary }}
+                  unselectedStyle={{ backgroundColor: "#E0E0E0" }}
+                  trackStyle={{ height: 5 }}
                   sliderLength={300}
                   markerStyle={{
                     height: 20,
@@ -741,82 +765,87 @@ export default function Register() {
               </View>
             </View>
           </ScrollView>
-        ) : selectedMenu === 'advanced' ? (
+        ) : selectedMenu === "advanced" ? (
           <ScrollView>
-            <View style={{marginTop: 16}}>
-              <Text style={[fonts.B1, {marginBottom: 10, color: theme.text}]}>
+            <View style={{ marginTop: 16 }}>
+              <Text style={[fonts.B1, { marginBottom: 10, color: theme.text }]}>
                 Family plans:
               </Text>
               <SelectComponent
                 options={familyplans}
                 onSelect={(option: any) => {
-                  handleOptionPress('family_plans_id', option);
+                  handleOptionPress("family_plans_id", option);
                 }}
                 textOption={
-                  user?.family_plans ? user?.family_plans?.name : 'Select'
+                  user?.family_plans ? user?.family_plans?.name : "Select"
                 }
               />
             </View>
 
             <View>
-              <Text style={[fonts.B1, {marginBottom: 10, color: theme.text}]}>
+              <Text style={[fonts.B1, { marginBottom: 10, color: theme.text }]}>
                 Political views
               </Text>
               <SelectComponent
                 options={political}
                 onSelect={(option: any) => {
-                  handleOptionPress('politicals_id', option);
+                  handleOptionPress("politicals_id", option);
                 }}
                 textOption={
-                  user?.politicals ? user?.politicals?.name : 'Select'
+                  user?.politicals ? user?.politicals?.name : "Select"
                 }
               />
             </View>
 
             <View>
-              <Text style={[fonts.B1, {marginBottom: 10, color: theme.text}]}>
+              <Text style={[fonts.B1, { marginBottom: 10, color: theme.text }]}>
                 Religion
               </Text>
               <SelectComponent
                 options={religion}
                 onSelect={(option: any) => {
-                  handleOptionPress('religions_id', option);
+                  handleOptionPress("religions_id", option);
                 }}
-                textOption={user?.religions ? user.religions?.name : 'Select'}
+                textOption={user?.religions ? user.religions?.name : "Select"}
               />
             </View>
 
             <View>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={[fonts.B1, {marginBottom: 10, color: theme.text}]}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text
+                  style={[fonts.B1, { marginBottom: 10, color: theme.text }]}
+                > 
                   Sun sign
                 </Text>
               </View>
 
               <TouchableOpacity
                 onPress={() =>
-                  navigation.navigate('selection', {
-                    type: 'sunSign',
+                  navigation.navigate("selectionuser", {
+                    type: "sunSign",
                     //selectedValue: formDetails.sun_sign,
                     onSelect: user?.sunsigns || [],
                   })
-                }>
+                }
+              >
                 <View
                   style={[
                     styles.input,
                     {
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
                       backgroundColor: theme.backgroundChat,
                     },
-                  ]}>
+                  ]}
+                >
                   <View>
-                    <Text style={{color: theme.text}}>
-                      {user?.sunsigns &&
-                       user.sunsigns.length > 0
-                        ? user.sunsigns.map(sunSign => sunSign.name).join(', ')
-                        : 'Select'}
+                    <Text style={{ color: theme.text }}>
+                      {user?.sunsigns && user.sunsigns.length > 0
+                        ? user.sunsigns
+                            .map((sunSign) => sunSign.name)
+                            .join(", ")
+                        : "Select"}
                     </Text>
                   </View>
                   <View>
@@ -827,77 +856,38 @@ export default function Register() {
             </View>
 
             <View>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={[fonts.B1, {marginBottom: 10, color: theme.text}]}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text
+                  style={[fonts.B1, { marginBottom: 10, color: theme.text }]}
+                >
                   Education
                 </Text>
               </View>
 
               <TouchableOpacity
                 onPress={() =>
-                  navigation.navigate('selection', {
-                    type: 'education',
+                  navigation.navigate("selectionuser", {
+                    type: "education",
                     onSelect: user?.educations || null,
                   })
-                }>
+                }
+              >
                 <View
                   style={[
                     styles.input,
                     {
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
                       backgroundColor: theme.backgroundChat,
                     },
                   ]} // Agregamos justifyContent y alignItems
                 >
                   <View>
-                    <Text style={{color: theme.text}}>
-                    {user?.educations &&
-                     user.educations.length>0 
-                     ? user.educations.map(edu=>edu.name).join(', ')
-                     : 'Select'}
-
-                    </Text> 
-                  </View>
-                  <View>
-                    <ArrowRight />
-                  </View>
-                </View>
-              </TouchableOpacity>
-            </View>
-
-            <View>
-              <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Text style={[fonts.B1, {marginBottom: 10, color: theme.text}]}>
-                  Ethnicity
-                </Text>
-              </View>
-
-              <TouchableOpacity
-                onPress={() =>
-                  navigation.navigate('selection', {
-                    type: 'ethnicity',
-                    selectedValue: formDetails.ethnicity,
-                    onSelect: user?.ethnicities || null,
-                  })
-                }>
-                <View
-                  style={[
-                    styles.input,
-                    {
-                      flexDirection: 'row',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      backgroundColor: theme.backgroundChat,
-                    },
-                  ]}>
-                  <View>
-                    <Text style={{color: theme.text}}>
-                    {user?.ethnicities &&
-                       user.ethnicities.length > 0
-                        ? user.ethnicities.map(eth => eth.name).join(', ')
-                        : 'Select'}
+                    <Text style={{ color: theme.text }}>
+                      {user?.educations && user.educations.length > 0
+                        ? user.educations.map((edu) => edu.name).join(", ")
+                        : "Select"}
                     </Text>
                   </View>
                   <View>
@@ -908,98 +898,154 @@ export default function Register() {
             </View>
 
             <View>
-              <Text style={[fonts.B2, {marginVertical: 14, color: theme.text}]}>
+              <View style={{ flexDirection: "row", alignItems: "center" }}>
+                <Text
+                  style={[fonts.B1, { marginBottom: 10, color: theme.text }]}
+                >
+                  Ethnicity
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                onPress={() =>
+                  navigation.navigate("selectionuser", {
+                    type: "ethnicity",
+                    selectedValue: formDetails.ethnicity,
+                    onSelect: user?.ethnicities || null,
+                  })
+                }
+              >
+                <View
+                  style={[
+                    styles.input,
+                    {
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      backgroundColor: theme.backgroundChat,
+                    },
+                  ]}
+                >
+                  <View>
+                    <Text style={{ color: theme.text }}>
+                      {user?.ethnicities && user.ethnicities.length > 0
+                        ? user.ethnicities.map((eth) => eth.name).join(", ")
+                        : "Select"}
+                    </Text>
+                  </View>
+                  <View>
+                    <ArrowRight />
+                  </View>
+                </View>
+              </TouchableOpacity>
+            </View>
+
+            <View>
+              <Text
+                style={[fonts.B2, { marginVertical: 14, color: theme.text }]}
+              >
                 Lifestyle
               </Text>
               <View>
-                <Text style={[fonts.B1, {marginBottom: 10, color: theme.text}]}>
+                <Text
+                  style={[fonts.B1, { marginBottom: 10, color: theme.text }]}
+                >
                   Are you active?
                 </Text>
                 <SelectComponent
                   options={active}
                   onSelect={(option: any) => {
-                    handleOptionPress('lifestyle_active_id', option);
+                    handleOptionPress("lifestyle_active_id", option);
                   }}
                   textOption={
                     user?.lifestyle_active
                       ? user.lifestyle_active?.name
-                      : 'Select'
+                      : "Select"
                   }
                 />
               </View>
               <View>
-                <Text style={[fonts.B1, {marginBottom: 10, color: theme.text}]}>
+                <Text
+                  style={[fonts.B1, { marginBottom: 10, color: theme.text }]}
+                >
                   Do you drink?
                 </Text>
                 <SelectComponent
                   options={drink}
                   onSelect={(option: any) => {
-                    handleOptionPress('lifestyle_drink_id', option);
+                    handleOptionPress("lifestyle_drink_id", option);
                   }}
                   textOption={
                     user?.lifestyle_drink
                       ? user.lifestyle_drink?.name
-                      : 'Select'
+                      : "Select"
                   }
                 />
               </View>
               <View>
-                <Text style={[fonts.B1, {marginBottom: 10, color: theme.text}]}>
+                <Text
+                  style={[fonts.B1, { marginBottom: 10, color: theme.text }]}
+                >
                   Do you smoke tobacco?
                 </Text>
                 <SelectComponent
                   options={smoketobaco}
                   onSelect={(option: any) => {
-                    handleOptionPress('lifestyle_tabacco_id', option);
+                    handleOptionPress("lifestyle_tabacco_id", option);
                   }}
                   textOption={
                     user?.lifestyle_tabacco
                       ? user?.lifestyle_tabacco?.name
-                      : 'Select'
+                      : "Select"
                   }
                 />
               </View>
 
               <View>
-                <Text style={[fonts.B1, {marginBottom: 10, color: theme.text}]}>
+                <Text
+                  style={[fonts.B1, { marginBottom: 10, color: theme.text }]}
+                >
                   Do you smoke weed?
                 </Text>
                 <SelectComponent
                   options={smokeweed}
                   onSelect={(option: any) => {
-                    handleOptionPress('lifestyle_weed_id', option);
+                    handleOptionPress("lifestyle_weed_id", option);
                   }}
                   textOption={
-                    user?.lifestyle_weed ? user.lifestyle_weed?.name : 'Select'
+                    user?.lifestyle_weed ? user.lifestyle_weed?.name : "Select"
                   }
                 />
               </View>
 
               <View>
-                <Text style={[fonts.B1, {marginBottom: 10, color: theme.text}]}>
+                <Text
+                  style={[fonts.B1, { marginBottom: 10, color: theme.text }]}
+                >
                   Do you use drugs?
                 </Text>
                 <SelectComponent
                   options={drugs}
                   onSelect={(option: any) => {
-                    handleOptionPress('lifestyle_drug_id', option);
+                    handleOptionPress("lifestyle_drug_id", option);
                   }}
                   textOption={
-                    user?.lifestyle_drug ? user.lifestyle_drug?.name : 'Select'
+                    user?.lifestyle_drug ? user.lifestyle_drug?.name : "Select"
                   }
                 />
               </View>
             </View>
           </ScrollView>
         ) : (
-          <Text style={{color: theme.text}}>No selected menu</Text>
+          <Text style={{ color: theme.text }}>No selected menu</Text>
         )}
       </ScrollView>
       <View
         style={[
           styles.bannerContainer,
-          {backgroundColor: theme.background, paddingHorizontal: 0},
-        ]}>
+          { backgroundColor: theme.background, paddingHorizontal: 0 },
+        ]}
+      >
         <TouchableOpacity style={[styles.button]}>
           <Text
             style={[
@@ -1009,10 +1055,10 @@ export default function Register() {
               },
             ]}
             onPress={() => {
-              console.log('VALIDATE', formDetails);
+              console.log("VALIDATE", formDetails);
               ValidateForm();
             }}
-            >
+          >
             Save changes
           </Text>
         </TouchableOpacity>
@@ -1049,15 +1095,15 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary.medium,
     borderRadius: 20,
     paddingVertical: 16,
-    alignItems: 'center',
-    position: 'absolute',
+    alignItems: "center",
+    position: "absolute",
     bottom: 20, // Espacio desde la parte inferior
     left: 20,
     right: 20,
   },
   checkboxContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 24,
   },
   checkbox: {
@@ -1066,8 +1112,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 5,
     marginRight: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   checked: {
     backgroundColor: colors.primary.medium,
@@ -1076,17 +1122,17 @@ const styles = StyleSheet.create({
   checkboxText: {
     fontSize: 14,
     color: colors.neutral.dark,
-    maxWidth: '80%',
+    maxWidth: "80%",
   },
 
   buttonContainer: {
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
     marginBottom: 24,
   },
   optionButton: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     borderWidth: 1,
     borderRadius: 20,
     paddingVertical: 12,
@@ -1094,9 +1140,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   optionButtonB: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     borderWidth: 1.5,
     borderColor: colors.neutral.medium,
     borderRadius: 20,
@@ -1115,7 +1161,7 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   selectedText: {},
 
@@ -1137,13 +1183,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   questionHeader: {
-    flexDirection: 'row',
-    width: '100%',
+    flexDirection: "row",
+    width: "100%",
     marginBottom: 20,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   menuContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     borderBottomWidth: 1,
     paddingBottom: 6,
   },
@@ -1151,7 +1197,7 @@ const styles = StyleSheet.create({
     marginRight: 20,
     paddingVertical: 10,
     borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
+    borderBottomColor: "transparent",
   },
   selectedMenuItem: {
     borderBottomWidth: 1,
@@ -1161,7 +1207,7 @@ const styles = StyleSheet.create({
   menuText: {
     fontSize: 16,
     color: colors.neutral.darkest,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   selectedMenuText: {
     color: colors.primary.medium,
@@ -1177,52 +1223,52 @@ const styles = StyleSheet.create({
     color: colors.neutral.darkest,
   },
   chatContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   chatContent: {
     flex: 1,
-    justifyContent: 'center',
-    alignContent: 'center',
+    justifyContent: "center",
+    alignContent: "center",
   },
   switchContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     marginVertical: 20,
   },
   modalBackground2: {
-    height:"100%",
-    backgroundColor:  'rgba(0, 0, 0, 0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    height: "100%",
+    backgroundColor: "rgba(0, 0, 0, 0.2)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalView2: {
     backgroundColor: colors.neutral.white,
     borderRadius: 20,
     padding: 20,
-    width: '80%',
-    position: 'relative',
+    width: "80%",
+    position: "relative",
   },
   closeButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 10,
     right: 10,
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
-    textAlign: 'center',
+    textAlign: "center",
   },
   horizontalButtonContainer: {
-    width: '100%',
+    width: "100%",
     marginTop: 12,
   },
   buttonText: {
     color: colors.neutral.white,
-    justifyContent: 'center',
-    alignSelf: 'center',
+    justifyContent: "center",
+    alignSelf: "center",
   },
   confirmButton: {
     backgroundColor: colors.primary.medium,
@@ -1240,8 +1286,8 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 15,
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
-        shadowOffset: {width: 0, height: 2},
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
       },

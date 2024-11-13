@@ -233,6 +233,7 @@ export default function DetailProfilemsg() {
       console.error('Error loading order:', error);
     }
   };
+  console.log(">>>>>>>>>>>>>>>>>>>>> ",savedItemsCard)
   useFocusEffect(
     React.useCallback(() => {
       loadSavedOrder(); // Cargar los datos cuando la pantalla esté en foco

@@ -49,7 +49,7 @@ import Upgrade from '../Screens/User/Profile/Upgrade';
 
 import EditPhoto from '../Screens/User/Profile/EditPhoto'
 import Preview from '../Screens/User/Profile/Preview';
-import Selection from '../Screens/NoUser/Data'
+import SelectionUserScreen from '../Screens/User/DataUser'
 
 
 
@@ -99,7 +99,7 @@ import Selection from '../Screens/NoUser/Data'
        <Stack.Screen name="editphoto" component={EditPhoto} options={{ headerShown: false, tabBarVisible: false}}/>
 
        <Stack.Screen name="preview" component={Preview} options={{ headerShown: false, tabBarVisible: false}}/>
-       <Stack.Screen name="selection" component={Selection} options={{ headerShown: false}}/>
+       <Stack.Screen name="selectionuser" component={SelectionUserScreen} options={{ headerShown: false, tabBarVisible: false}}/>
 
 
 

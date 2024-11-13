@@ -220,16 +220,25 @@ export default function DetailProfilemsg() {
   //****************** */
   //get data in storage
   const [savedItemsCard, setSavedItemsCard] = useState([]);
+  const [infoOrderCard, setInfoOrderCard] = useState([]);
 
   const loadSavedOrder = async () => {
     try {
       const storedOrder = await AsyncStorage.getItem('itemsCardOrder');
+      const infoOrder = await AsyncStorage.getItem('InfoUser');
+      
       if (storedOrder !== null) {
         setSavedItemsCard(JSON.parse(storedOrder));
+      }
+      if (infoOrder !== null) {
+        setInfoOrderCard(JSON.parse(infoOrder));
       }
     } catch (error) {
       console.error('Error loading order:', error);
     }
+    console.log(">>>>>>>>> ",savedItemsCard)
+    console.log(">>>>>>>>> ",infoOrderCard)
+
   };
   useFocusEffect(
     React.useCallback(() => {

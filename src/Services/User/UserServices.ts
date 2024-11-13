@@ -689,7 +689,36 @@ async function PostAttributes(attributes: any) {
     return error.message;
   }
 }
+async function UpdateAttributes(attributes: any) {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    console.log(token);
 
+    const url = `${environment.urlApi}/api/me/attributes`;
+
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    };
+
+    const body={
+      attributes:attributes
+    }
+    console.log("BODY AA ",body)
+    const response = await axios.patch(url, body, { headers });
+
+    if (response.status === 200 || response.status === 201) {
+      return response.data.status;
+    } else {
+      console.log(response.data.status);
+      return 'other';
+    }
+  } catch (error: any) {
+    console.log('Error:', error.message);
+    return error.message;
+  }
+}
 async function GetLookings() {
   try {
     const token = await AsyncStorage.getItem('token');
@@ -1155,7 +1184,35 @@ async function GetPromptsMe() {
     return error.message;
   }
 }
+async function UpdatePromptsMe(prompts) {
+  console.log("v....",prompts)
+  try {
+    const token = await AsyncStorage.getItem('token');
+    console.log(token);
 
+    const url = `${environment.urlApi}/api/me/prompts`;
+
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    };
+    const body = {
+      prompts: prompts
+    };
+    console.log("body ",body)
+    const response = await axios.patch(url, body, { headers });
+
+    if (response.status === 200 || response.status === 201) {
+      return response.data.status;
+    } else {
+      console.log(response.data.status);
+      return 'other';
+    }
+  } catch (error: any) {
+    console.log('Error:', error.message);
+    return error.message;
+  }
+}
 async function RegisterPhotos(photos: any) {
   try {
     const token = await AsyncStorage.getItem('token');
@@ -1719,7 +1776,7 @@ async function UpdateEducations(educations: any[]) {
     };
     const body = {
       educations: educations.map(education => ({
-        education_id: education.id,
+        education_id: education.education_id,
       })),
     };
     console.log("body ED", body)
@@ -1757,9 +1814,11 @@ export {
   GetAttributes,
   //
   PostAttributes,
+  UpdateAttributes,
   GetLookings,
   PostLookings,
   GetPrompts,
+  UpdatePromptsMe,
   RegisterPhotos,
   GetAllPhotos,
   UpdatePhotos,

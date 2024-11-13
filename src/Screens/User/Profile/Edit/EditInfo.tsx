@@ -183,7 +183,9 @@ export default function Register() {
         const data = await GetEducation();
         const transformedOptions = data.map(item => ({
           label: item.name,
-          value: item,
+          value: {
+            "education_id":item.id,
+          },
         }));
         setEducation(transformedOptions);
       } catch (error) {
@@ -404,8 +406,10 @@ export default function Register() {
       sex_interests_id: formDetails.sex_interests_id,
        
     });
+    
     const UpdateSunSing = UpdateSunSingns([formDetails.sunsigns]);
     const UpdateEthnicity = UpdateEthnicities([formDetails.ethnicities]);
+    console.log("MMMM",formDetails.educations)
     const UpdateEducation = UpdateEducations([formDetails.educations]);
 
     if (

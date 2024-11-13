@@ -2,6 +2,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import {
   View,
   Text,
+  Button,
   TouchableOpacity,
   StyleSheet,
   ScrollView,
@@ -10,27 +11,23 @@ import {
 import {
   GetEducation,
   GetEthnicity,
-  GetGenders,
-  GetSexInterests,
   GetSunsign,
 } from '../../Services/User/UserServices';
 import Header from '../../Components/Header';
 import colors from '../../Utils/colors';
+import fonts from '../../Utils/fonts';
 import {environment} from '../../Services/environtment';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {ThemeContext} from '../../Components/themeContext';
-import fonts from '../../Utils/fonts';
 
 const SelectionScreen = ({route, navigation}: any) => {
   const {type, onSelect} = route.params;
-
   const {theme} = useContext(ThemeContext);
 
   const [formData, setFormData] = useState({
     sunSign: [],
     ethnicity: [],
     education: [],
-    genders: []
   });
 
   // Función para seleccionar una opción y regresar a la pantalla de formulario
@@ -123,28 +120,6 @@ const SelectionScreen = ({route, navigation}: any) => {
           console.log(`Error en el envío: ${error}`);
         }
       }
-      if (formData.genders.length > 0) {
-        console.log(formData.genders);
-
-        const responseGenders = await fetch(
-          `${environment.urlApi}/api/me/genders`,
-          {
-            method: 'POST',
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-            // Asegúrate de que el nombre de la propiedad sea 'genders'
-            body: JSON.stringify({genders: formData.genders}),
-          },
-        );
-
-        if (!responseGenders.ok) {
-          throw new Error('Error al enviar genders');
-        } else {
-          console.log('Genders enviado correctamente');
-        }
-      }
 
       // Si todas las solicitudes fueron exitosas, volvemos a la pantalla anterior con la data actualizada
       handleSelect(formData);
@@ -155,7 +130,7 @@ const SelectionScreen = ({route, navigation}: any) => {
 
   const handleOptionPressMultiple = (
     attributeId: number,
-    field: 'sunSign' | 'ethnicity' | 'education' | 'genders',
+    field: 'sunSign' | 'ethnicity' | 'education',
   ) => {
     // Aseguramos que el campo sea un array y el nombre del campo sea correcto
     const updatedFormDetails = {
@@ -192,7 +167,7 @@ const SelectionScreen = ({route, navigation}: any) => {
 
   const handleOptionPressMultiple2 = (
     attributeId: number,
-    field: 'sunSign' | 'ethnicity' | 'education'  ,
+    field: 'sunSign' | 'ethnicity' | 'education',
   ) => {
     // Aseguramos que el campo sea un array y el nombre del campo sea correcto
     const updatedFormDetails = {
@@ -229,7 +204,7 @@ const SelectionScreen = ({route, navigation}: any) => {
 
   const handleOptionPressMultiple3 = (
     attributeId: number,
-    field: 'sunSign' | 'ethnicity' | 'education'| 'genders',
+    field: 'sunSign' | 'ethnicity' | 'education',
   ) => {
     // Aseguramos que el campo sea un array y el nombre del campo sea correcto
     const updatedFormDetails = {
@@ -264,39 +239,7 @@ const SelectionScreen = ({route, navigation}: any) => {
     setFormData(updatedFormDetails);
   };
 
-  const handleOptionPressMultiple4 = (
-    attributeId: number,
-    field: 'sunSign' | 'ethnicity' | 'education'| 'genders',
-  ) => {
-    const updatedFormDetails = {
-      ...formData,
-      [field]: formData[field] || [],
-    };
-    const existingAttribute = updatedFormDetails[field].find(
-      item => item.id === attributeId,
-    );
-    if (existingAttribute) {
-      updatedFormDetails[field] = updatedFormDetails[field].filter(
-        item => item.id !== attributeId,
-      );
-    } else {
-      updatedFormDetails[field].push({
-        id: attributeId,
-      });
-    }
-
-    // Consola para ver el resultado
-    console.log(
-      `Atributos seleccionados para ${field}:`,
-      updatedFormDetails[field],
-    );
-
-    // Actualizamos el estado con los detalles actualizados
-    setFormData(updatedFormDetails);
-  };
-
   const [sunSign, setSunsign] = useState([]);
-  const [sex, setSex] = useState([]);
   const [ethnicity, setEthnicity] = useState([]);
   const [education, setEducation] = useState([]);
 
@@ -329,15 +272,10 @@ const SelectionScreen = ({route, navigation}: any) => {
         console.error('Error fetching education levels:', error);
       }
     };
-    const fetchSex = async () => {
-      const data = await GetSexInterests();
-      setSex(data);
-    };
 
     fetchEducation();
     fetchSunsign();
     fetchEthnicity();
-    fetchSex();
   }, []); // El array vacío [] hace que useEffect se ejecute solo una vez cuando el componente se monta.
 
   console.log(sunSign);
@@ -355,24 +293,19 @@ const SelectionScreen = ({route, navigation}: any) => {
               contentContainerStyle={styles.scrollViewContent}>
               {sunSign?.length > 0 ? (
                 sunSign.map(attribute => {
-                  // Extrae los IDs seleccionados de onSelect
-                  const selectedIds = onSelect.map(
-                    item => item.UsersSunsignsEntity.sunsigns_id,
+                  const isSelected = formData.sunSign.some(
+                    item => item.sunsigns_id === attribute.id,
                   );
-
-                  // Verifica si el atributo actual está seleccionado
-                  const isSelected = selectedIds.includes(attribute.id);
-
-                  // Si hay más de tres seleccionados, desactiva el resto
-                  const isDisabled = selectedIds.length >= 3 && !isSelected;
+                  const isDisabled =
+                    formData.sunSign.length >= 3 && !isSelected;
 
                   return (
                     <TouchableOpacity
                       key={attribute.id}
                       style={[
                         styles.optionButtonB,
-                        isSelected && styles.selectedButtonB, // Aplica el estilo si está seleccionado
-                        isDisabled && styles.disabledButtonB, // Aplica el estilo si está desactivado
+                        isSelected && styles.selectedButtonB,
+                        isDisabled && styles.disabledButtonB,
                       ]}
                       onPress={() =>
                         !isDisabled &&
@@ -385,7 +318,7 @@ const SelectionScreen = ({route, navigation}: any) => {
                           {color: theme.text},
                           isSelected && [
                             styles.selectedText,
-                            {color: theme.text}, // Color si está seleccionado
+                            {color: theme.text},
                           ],
                           isDisabled && styles.disabledText,
                         ]}>
@@ -418,16 +351,12 @@ const SelectionScreen = ({route, navigation}: any) => {
               contentContainerStyle={styles.scrollViewContent}>
               {ethnicity?.length > 0 ? (
                 ethnicity.map(attribute => {
-                  // Extrae los IDs seleccionados de onSelect
-                  const selectedIds = onSelect.map(
-                    item => item.UsersEthnicitiesEntity.ethnicities_id,
+                  // Verificamos si el atributo está seleccionado
+                  const isSelected = formData.ethnicity.some(
+                    item => item.ethnicities_id === attribute.id,
                   );
-
-                  // Verifica si el atributo actual está seleccionado
-                  const isSelected = selectedIds.includes(attribute.id);
-
-                  // Si hay más de tres seleccionados, desactiva el resto
-                  const isDisabled = selectedIds.length >= 3 && !isSelected;
+                  const isDisabled =
+                    formData.ethnicity.length >= 3 && !isSelected; // Deshabilitar si ya hay 3 seleccionados
 
                   return (
                     <TouchableOpacity
@@ -444,12 +373,8 @@ const SelectionScreen = ({route, navigation}: any) => {
                       disabled={isDisabled}>
                       <Text
                         style={[
-                          styles.optionText,
-                          {color: theme.text},
-                          isSelected && [
-                            styles.selectedText,
-                            {color: theme.text},
-                          ], // Estilo de texto para seleccionados
+                          styles.optionText,{color:theme.text},
+                          isSelected && [styles.selectedText,{color:theme.text}], // Estilo de texto para seleccionados
                           isDisabled && styles.disabledText, // Estilo de texto para deshabilitados
                         ]}>
                         {attribute.name}
@@ -481,15 +406,12 @@ const SelectionScreen = ({route, navigation}: any) => {
               contentContainerStyle={styles.scrollViewContent}>
               {education?.length > 0 ? (
                 education.map(attribute => {
-                  const selectedIds = onSelect.map(
-                    item => item.id,
+                  // Verificamos si el atributo está seleccionado
+                  const isSelected = formData.education.some(
+                    item => item.education_id === attribute.id,
                   );
-
-                  // Verifica si el atributo actual está seleccionado
-                  const isSelected = selectedIds.includes(attribute.id);
-
-                  // Si hay más de tres seleccionados, desactiva el resto
-                  const isDisabled = selectedIds.length >= 3 && !isSelected;
+                  const isDisabled =
+                    formData.education.length >= 3 && !isSelected; // Deshabilitar si ya hay 3 seleccionados
 
                   return (
                     <TouchableOpacity
@@ -506,12 +428,8 @@ const SelectionScreen = ({route, navigation}: any) => {
                       disabled={isDisabled}>
                       <Text
                         style={[
-                          styles.optionText,
-                          {color: theme.text},
-                          isSelected && [
-                            styles.selectedText,
-                            {color: theme.text},
-                          ], // Estilo de texto para seleccionados
+                          styles.optionText,{color:theme.text},
+                          isSelected && [styles.selectedText,{color:theme.text}], // Estilo de texto para seleccionados
                           isDisabled && styles.disabledText, // Estilo de texto para deshabilitados
                         ]}>
                         {attribute.name}
@@ -529,64 +447,6 @@ const SelectionScreen = ({route, navigation}: any) => {
             <TouchableOpacity style={styles.button3} onPress={handleSubmit}>
               <Text style={{color: colors.neutral.white}}>Continue</Text>
             </TouchableOpacity>
-          </>
-        );
-        case 'gender':
-          return (
-            <>
-            <Header onPress={() => navigation.goBack()} />
-            <Text style={[fonts.H3, {marginVertical: 20, color: theme.text}]}>
-              Who do you want to date?
-            </Text>
-            <Text style={[fonts.B1, {marginBottom: 24, color: theme.text}]}>
-              Select the gender of your interest.
-            </Text>
-
-            <View style={styles.buttonContainer}>
-              {sex?.length > 0 ? (
-                sex?.map(attribute => {
-                  const selectedIds = onSelect.map(
-                    item => item.id,
-                  );
-
-                  const isSelected = selectedIds.includes(attribute.id);
-
-                  const isDisabled = selectedIds.length >= 3 && !isSelected;
-
-
-
-                 return(
-                  <TouchableOpacity
-                  key={attribute.id}
-                  style={[
-                    styles.optionButton,
-                    isSelected && styles.selectedButtonB, // Estilo para elementos seleccionados
-                    isDisabled && styles.disabledButtonB, // Estilo para elementos deshabilitados
-                  ]}
-                  onPress={() =>
-                    !isDisabled &&
-                    handleOptionPressMultiple4(attribute.id, 'education')
-                  }
-                  disabled={isDisabled}>
-                  <Text
-                    style={[
-                      styles.optionText,
-                      {color: theme.text},
-                      isSelected && [
-                        styles.selectedText,
-                        {color: theme.text},
-                      ], // Estilo de texto para seleccionados
-                      isDisabled && styles.disabledText, // Estilo de texto para deshabilitados
-                    ]}>
-                    {attribute.name}
-                  </Text>
-                </TouchableOpacity>
-                 )
-                })
-              ) : (
-                <Text>Loading genders...</Text>
-              )}
-            </View>
           </>
         );
       default:
