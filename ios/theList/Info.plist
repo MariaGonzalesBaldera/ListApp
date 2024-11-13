@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>en</string>
+	<key>CFBundleDisplayName</key>
+	<string>theList</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MARKETING_VERSION)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleVersion</key>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>GMSApiKey</key>
+	<string>AIzaSyASBgfi0RHYmMgXyeGYhLF1E1yApPNrMDQ</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<false/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>Se requiere acceder a las fotos</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Se requiere el acceso al calendario</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Se requiere acceso a la camara</string>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>Se requiere acceder a los documentos</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>Se requiere acceder a la ubicacion</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Se requiere acceder a la ubicacion</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Se requiere su posicion en el mapa</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Se requiere acceder a la ubicacion</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Se requiere el uso del microfono</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Se requiere acceder a las fotos</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Se requiere acceder a las fotos</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>CrimsonPro-Black.ttf</string>
+		<string>CrimsonPro-BlackItalic.ttf</string>
+		<string>CrimsonPro-Bold.ttf</string>
+		<string>CrimsonPro-BoldItalic.ttf</string>
+		<string>CrimsonPro-ExtraBold.ttf</string>
+		<string>CrimsonPro-ExtraBoldItalic.ttf</string>
+		<string>CrimsonPro-ExtraLight.ttf</string>
+		<string>CrimsonPro-ExtraLightItalic.ttf</string>
+		<string>CrimsonPro-Italic.ttf</string>
+		<string>CrimsonPro-Light.ttf</string>
+		<string>CrimsonPro-LightItalic.ttf</string>
+		<string>CrimsonPro-Medium.ttf</string>
+		<string>CrimsonPro-MediumItalic.ttf</string>
+		<string>CrimsonPro-Regular.ttf</string>
+		<string>CrimsonPro-SemiBold.ttf</string>
+		<string>CrimsonPro-SemiBoldItalic.ttf</string>
+	</array>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIRequiredDeviceCapabilities</key>
+	<array>
+		<string>arm64</string>
+	</array>
+	<key>UIStatusBarStyle</key>
+	<string></string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+	<key>GIDClientID</key>
+	<string>1068621979148-71qg8selti9rrq2d9fqtcl5vr7fnrpv8.apps.googleusercontent.com</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+  		<dict>
+    		<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.1068621979148-71qg8selti9rrq2d9fqtcl5vr7fnrpv8</string>
+			</array>
+  		</dict>
+	</array>
+</dict>
+</plist>
