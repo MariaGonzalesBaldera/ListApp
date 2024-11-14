@@ -90,6 +90,7 @@ export default function Match({ route }: any) {
           onPress={() => navigation.navigate('ChatStack', { screen: 'messaging', params: { id: userId } })}
           text={'Start a conversation'} 
           colors={colors.primary.medium}
+          colorText={colors.neutral.white}
         />
               
 
@@ -119,6 +120,8 @@ const styles = StyleSheet.create({
     width: 140,
     height:140,
     borderRadius:70,
+    borderWidth: 4,
+    borderColor: colors.neutral.white
   },
   whiteSpace: {
     backgroundColor: colors.neutral.white,

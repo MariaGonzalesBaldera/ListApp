@@ -80,7 +80,7 @@ async function ContactUs(description: any) {
     };
 
     const response = await axios.post(url, data, { headers });
-
+    console.log('response', response.data.status)
     if (response.status === 200) {
       //console.log('response', (response.data.access_token).toString())
       return response.data.status;

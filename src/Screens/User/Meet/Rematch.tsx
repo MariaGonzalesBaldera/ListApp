@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import fonts from '../../../Utils/fonts';
 import colors from '../../../Utils/colors';
+import {ArrowLeft} from '../../../Assets/svg';
 import {BackR, BtnCheck, BtnX, List} from '../../../Assets/svg';
 import LinearGradient from 'react-native-linear-gradient';
 import {
@@ -139,16 +140,15 @@ export default function DetailProfilemsg() {
     navigation.navigate('match');
   };
 
-  const handleSwipe = async (userId, isLike) => {
+  const handleSwipe = async (userId: any, isLike: any) => {
     const swipeResult = await Swipe(userId, isLike);
     console.log('Resultado del Swipe:', swipeResult);
     
     if (swipeResult.is_match === true) {
-      navigation.navigate('match', {userId: userId});
+      navigation.navigate('match', {userId});
     } else {
       handleNextProfile(); // Mueve al siguiente perfil
     }
-
   };
 
   // SWIPE
@@ -294,8 +294,8 @@ export default function DetailProfilemsg() {
       <View style={{flex: 1, backgroundColor: theme.background}}>
         <SafeAreaView />
         <HeaderUser
-          svg={<BackR color={theme.text} />}
-          onPress={() => navigation.navigate('rematch')}
+          svg={<ArrowLeft color={theme.text} />}
+          onPress={() => navigation.goBack()}
           svg2={<List color={theme.text} />}
           onPress2={() => navigation.navigate('meetindex')}
         />      
@@ -339,7 +339,7 @@ export default function DetailProfilemsg() {
                 }}>
                 <TouchableOpacity
                   style={{marginTop: 8}}
-                  onPress={() => handleNextProfile()}>
+                  onPress={() => handleSwipe(currentProfile?.id, false)}>
                   <BtnX color={colors.neutral.dark} />
                 </TouchableOpacity>
               </View>
@@ -355,8 +355,7 @@ export default function DetailProfilemsg() {
                 <TouchableOpacity
                   style={{marginTop: 8}}
                   onPress={() => {
-                    navigation.navigate('match');
-                    handleNextProfile();
+                    handleSwipe(currentProfile?.id, true);
                   }}>
                   <BtnCheck />
                 </TouchableOpacity>

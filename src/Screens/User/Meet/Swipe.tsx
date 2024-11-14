@@ -79,6 +79,7 @@ export default function DetailProfilemsg() {
   }));
 
   const currentProfile = profiles[currentIndex];
+  console.log('CP', currentProfile)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -142,7 +143,7 @@ export default function DetailProfilemsg() {
     console.log('Resultado del Swipe:', swipeResult);
     
     if (swipeResult.is_match === true) {
-      navigation.navigate('match');
+      navigation.navigate('match', {userId});
     } else {
       handleNextProfile(); // Mueve al siguiente perfil
     }
@@ -311,6 +312,7 @@ export default function DetailProfilemsg() {
           )
         }
        
+       { currentProfile !== undefined ?  
         <ScrollView style={{paddingHorizontal: 20}}>
           {/* Perfil con gestos */}
           <PanGestureHandler onGestureEvent={gestureHandler}>
@@ -480,7 +482,15 @@ export default function DetailProfilemsg() {
             keyExtractor={item => item.key}
           /> */}
         
-        </ScrollView>
+        </ScrollView> : 
+        <>
+        <View style={styles.noChatsContainer}>
+                <Text style={[styles.noChatsText, fonts.H1,{color:theme.text}]}>
+                  There are no users available now
+                </Text>
+              </View>
+        </> }
+       
       </View>
     </GestureHandlerRootView>
   );
@@ -509,5 +519,15 @@ const styles = StyleSheet.create({
   verticalItem: {
     marginBottom: 12,
     flexDirection: 'row',
+  },
+  noChatsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  noChatsText: {
+    fontSize: 18,
+    textAlign: 'center',
   },
 });

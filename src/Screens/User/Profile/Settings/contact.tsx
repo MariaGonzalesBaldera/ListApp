@@ -65,10 +65,10 @@ export default function CardType() {
   const ContactUS = async () => {
     try {
       const data = await ContactUs(formProfile.description);
-      if (data) {
+      if (data === true) {
         setCancelMatchVisible(true)
         console.log('Correcto');
-        setFormProfile(prevState => ({...prevState, description: ''}));
+        //setFormProfile(prevState => ({...prevState, description: ''}));
 
       } else {
         console.error('Error');
@@ -91,11 +91,7 @@ export default function CardType() {
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.modalBackground2}>
           <View style={styles.modalView2}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => onClose}>
-              <Close />
-            </TouchableOpacity>
+           
             {children}
           </View>
         </View>

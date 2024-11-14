@@ -134,6 +134,7 @@ export default function MeetIndex() {
     fetchUser();
   }, []);
 
+
   // Renderización de los elementos en pares
   const renderItems = () => {
     const itemsToRender = showAll ? swipe : swipe.slice(0, 12); // Mostrar solo los primeros 4 elementos o todos si showAll es true
@@ -166,28 +167,38 @@ export default function MeetIndex() {
           onPress={() => navigation.goBack()}
         />
       </View>
-      <View style={{paddingHorizontal: 28}}>
-        <ScrollView
-          showsVerticalScrollIndicator={false} // Oculta la barra de desplazamiento vertical
-          showsHorizontalScrollIndicator={false} // Oculta la barra de desplazamiento horizontal, si es necesario
-          contentContainerStyle={styles.scrollView}>
-          <Text
-            style={[
-              fonts.C3B,
-              styles.description,
-              {marginBottom: 16, color: theme.text},
-            ]}>
-            Daily matches that check the boxes on your List.
-          </Text>
-          <View style={styles.scrollView}>{renderItems()}</View>
-        </ScrollView>
-      </View>
 
-      {!showAll && (
+    { swipe.length > 0 ? 
+    <View style={{paddingHorizontal: 28}}>
+    <ScrollView
+      showsVerticalScrollIndicator={false} // Oculta la barra de desplazamiento vertical
+      showsHorizontalScrollIndicator={false} // Oculta la barra de desplazamiento horizontal, si es necesario
+      contentContainerStyle={styles.scrollView}>
+      <Text
+        style={[
+          fonts.C3B,
+          styles.description,
+          {marginBottom: 16, color: theme.text},
+        ]}>
+        Daily matches that check the boxes on your List.
+      </Text>
+      <View style={styles.scrollView}>{renderItems()}</View>
+    </ScrollView>
+
+    {!showAll && (
         <TouchableOpacity style={styles.button} onPress={handleShowAll}>
           <Text style={[fonts.Btn, styles.buttonText]}>Get more Matches</Text>
         </TouchableOpacity>
       )}
+  </View>
+   :  
+  <View style={styles.noChatsContainer}>
+                <Text style={[styles.noChatsText, fonts.H1,{color:theme.text}]}>
+                There are no users available
+                </Text>
+              </View>}
+
+     
     </View>
   );
 }
@@ -267,5 +278,16 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: '100%',
     height: '100%',
+  },
+  noChatsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal:20
+
+  },
+  noChatsText: {
+    fontSize: 18,
+    textAlign: 'center',
   },
 });
