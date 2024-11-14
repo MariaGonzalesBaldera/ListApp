@@ -593,6 +593,36 @@ async function GetGenders() {
     return error.message;
   }
 }
+async function UpDateGenders(genders: any[]) {
+  try {
+    if (!genders || !Array.isArray(genders) || genders.length === 0) {
+      return "genders no es válido";
+    }
+    const url = `${environment.urlApi}/api/me/genders`;
+    const token = await AsyncStorage.getItem('token');
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    };
+    const body = {
+      genders: genders.map(eth => ({
+        genders_id: eth.id,
+      })),
+    };
+    console.log('BODY eth', body.genders);
+    const response = await axios.patch(url, body, { headers });
+    if (response.status === 200) {
+      return response.data.status;
+    } else {
+      console.log(response.data.status);
+      return 'other';
+    }
+  } catch (error) {
+    console.log('Error eth:', error.message);
+    return error.message;
+  }
+}
 
 async function GetSexInterests() {
   try {
@@ -1764,9 +1794,10 @@ async function UpdateEthnicities(ethnicities: any[]) {
   }
 }
 async function UpdateEducations(educations: any[]) {
-  console.log(" AAAA", educations)
   try {
-
+    if (!educations || !Array.isArray(educations) || educations.length === 0) {
+      return "educations no es válido";
+    }
     const url = `${environment.urlApi}/api/me/educations`;
     const token = await AsyncStorage.getItem('token');
     const headers = {
@@ -1776,7 +1807,7 @@ async function UpdateEducations(educations: any[]) {
     };
     const body = {
       educations: educations.map(education => ({
-        education_id: education.education_id,
+        education_id: education.id,
       })),
     };
     console.log("body ED", body)
@@ -1810,6 +1841,7 @@ export {
   UpdateEducations,
   GetPronouns,
   GetGenders,
+  UpDateGenders,
   GetSexInterests,
   GetAttributes,
   //

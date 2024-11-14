@@ -409,13 +409,16 @@ export default function Register() {
     
     const UpdateSunSing = UpdateSunSingns([formDetails.sunsigns]);
     const UpdateEthnicity = UpdateEthnicities([formDetails.ethnicities]);
-    console.log("MMMM",formDetails.educations)
-    const UpdateEducation = UpdateEducations([formDetails.educations]);
+    const transformedEducation ={
+      id: formDetails.educations.education_id,
+    };
+    const UpdateEducation = UpdateEducations([transformedEducation]);
 
     if (
       (await Create) === true &&
       (await UpdateSunSing) === true &&
-      (await UpdateEthnicity) === true &&
+      (await UpdateEthnicity) === true
+      &&
       (await UpdateEducation) === true
     ) {
       console.log('EXITO UPDATE');
