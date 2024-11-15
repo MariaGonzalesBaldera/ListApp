@@ -255,7 +255,7 @@ async function LoginUserWithGoogle(email: any, google_id: any, latitude: any, lo
     }
   }
 }
-
+ 
 interface ProfileBody {
   age: any, //
   height: any, //
@@ -720,6 +720,7 @@ async function PostAttributes(attributes: any) {
   }
 }
 async function UpdateAttributes(attributes: any) {
+  console.log(attributes)
   try {
     const token = await AsyncStorage.getItem('token');
     console.log(token);
@@ -730,13 +731,9 @@ async function UpdateAttributes(attributes: any) {
       Authorization: `Bearer ${token}`,
       Accept: 'application/json',
       'Content-Type': 'application/json',
-    };
-
-    const body={
-      attributes:attributes
-    }
-    console.log("BODY AA ",body)
-    const response = await axios.patch(url, body, { headers });
+    }; 
+    console.log("BODY AA ",attributes)
+    const response = await axios.patch(url, attributes, { headers });
 
     if (response.status === 200 || response.status === 201) {
       return response.data.status;
@@ -749,6 +746,37 @@ async function UpdateAttributes(attributes: any) {
     return error.message;
   }
 }
+
+async function DeleteAttribute(attributeId: number) {
+  console.log("attributeId ",attributeId)
+
+  try {
+    const token = await AsyncStorage.getItem('token');
+
+    const url = `${environment.urlApi}/api/me/prompts/${attributeId}`;
+
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    };
+
+    const response = await axios.delete(url, { headers });
+
+    if (response.status === 200 || response.status === 204) {
+      console.log("RESPONSE DELETE ",response.data)
+      return response.data.status;
+    } else {
+      console.log('Unexpected status:', response.status);
+      return 'other';
+    }
+  } catch (error: any) {
+    console.log('Error:', error.message);
+    return error.message;
+  }
+}
+
+
 async function GetLookings() {
   try {
     const token = await AsyncStorage.getItem('token');
@@ -1831,7 +1859,7 @@ export {
   MeUser,
   CreateUser,
   LoginUser,
-  LoginUserWithGoogle,
+  LoginUserWithGoogle, 
   UpdateProfile,
   UpdateProfileSingle,
   PostSunSingns,
@@ -1844,7 +1872,7 @@ export {
   UpDateGenders,
   GetSexInterests,
   GetAttributes,
-  //
+  DeleteAttribute,
   PostAttributes,
   UpdateAttributes,
   GetLookings,

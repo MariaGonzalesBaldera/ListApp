@@ -58,12 +58,16 @@ export default function Login() {
         console.log('press');
         await GoogleSignin.hasPlayServices({showPlayServicesUpdateDialog: true});
         const userInfo = await GoogleSignin.signIn();
-        const {idToken} = await GoogleSignin.signIn();
+        const { idToken } = await GoogleSignin.signIn();
         console.log('name: ' + userInfo.user.name);
         console.log('email: ' + userInfo.user.email);
         console.log('photoUrl: ' + userInfo.user.photo);
+        console.log('givenName: ' + userInfo.user.givenName);
+        console.log('familyName: ' + userInfo.user.familyName);
         console.log('token: ' + idToken);
-        login();
+        //login();
+        //navigation.navigate('Register')
+        navigation.navigate('Register', { userInfo:{token:userInfo.idToken,user:userInfo.user} })
       } catch (error) {
         console.error('Error during Google sign-in:', error);
       }

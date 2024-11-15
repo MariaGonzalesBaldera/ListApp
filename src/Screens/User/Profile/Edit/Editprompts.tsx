@@ -23,10 +23,10 @@ import Headerprompts from "../../../../Components/ListA/headerprompt";
 
 import HeaderUser from "../../../../Components/HeaderUser";
 import {
+  DeleteAttribute,
   GetPrompts,
   GetPromptsMe,
   MeUser,
-  UpdateProfile,
   UpdatePromptsMe,
 } from "../../../../Services/User/UserServices";
 import { ThemeContext } from "../../../../Components/themeContext";
@@ -99,20 +99,27 @@ export default function Register() {
   useEffect(() => {
     const fetchUser = async () => {
       const userData = await MeUser();
-      console.log(userData.prompts);
       setPromptsMeOld(userData.prompts);
     };
+    const unsubscribeFocus = navigation.addListener("focus", () => {
+      console.log("Pantalla enfocada, actualizando usuario...");
+      fetchUser();
+    });
     fetchUser();
-  }, []);
+    return () => {
+      unsubscribeFocus();
+    };
+  }, [navigation]);
+
   useEffect(() => {
     const fetchPromptsMe = async () => {
       const data = await GetPromptsMe();
       setPromptsMe(data);
-      console.log("promps me", data);
       setFormDetails((prevState) => ({
         ...prevState,
         ["prompts"]: data,
       }));
+      console.log(formDetails.prompts)
     };
 
     fetchPromptsMe();
@@ -122,7 +129,6 @@ export default function Register() {
     const fetchPrompts = async () => {
       const data = await GetPrompts();
       setPromptsMenu(data);
-      console.log("aaarrgghhhp", data);
     };
 
     fetchPrompts();
@@ -134,38 +140,6 @@ export default function Register() {
   const disableBtn2 =
     formDetails.prompts.length === 0 || formDetails.prompts.length > 3;
   const disableBtn3 = !(formDetails.photos.length < 3);
-
-  const [selectedOptions, setSelectedOptions] = useState([]);
-
-  const handleOptionPressMultiple = (option: any) => {
-    // Creamos una copia de los detalles del formulario
-    const updatedFormDetails = { ...formDetails };
-
-    // Creamos una copia del array de opciones
-    const updatedOptions = [...updatedFormDetails.list];
-
-    // Comprobamos si la opción ya está en el array de opciones
-    const optionIndex = updatedOptions.indexOf(option);
-
-    // Si la opción está en el array, la eliminamos
-    if (optionIndex !== -1) {
-      updatedOptions.splice(optionIndex, 1);
-    } else {
-      // Si la opción no está en el array y hay menos de tres opciones seleccionadas, la agregamos
-      if (updatedOptions.length < 3) {
-        updatedOptions.push(option);
-      } else {
-        // Si ya hay tres opciones seleccionadas, no hacemos nada
-        return;
-      }
-    }
-
-    // Actualizamos los detalles del formulario con las opciones actualizadas
-    updatedFormDetails.list = updatedOptions;
-
-    // Actualizamos el estado con los detalles del formulario actualizados
-    setFormDetails(updatedFormDetails);
-  };
 
   const [checked, setChecked] = useState(false);
 
@@ -195,18 +169,8 @@ export default function Register() {
     "Menu 5": ["Option X", "Option Y", "Option Z"],
   };
 
-  const [selectedOption2, setSelectedOption2] = useState(null);
 
   const [answers, setAnswers] = useState(["", "", ""]); // Mantén el estado de los tres TextInput
-
-  const handleOptionPressPropmpt = (index: any, text: any) => {
-    console.log("index ", index);
-    console.log("text ", text);
-
-    const newAnswers = [...answers];
-    newAnswers[index] = text;
-    setAnswers(newAnswers);
-  };
 
   const getBackgroundColor = (index) => {
     if (answers[index].length > 0) {
@@ -222,10 +186,6 @@ export default function Register() {
     setStage(stage + 1); // Avanza a la siguiente etapa
   };
 
-  const handleBackAll = () => {
-    // Aquí puedes manejar la lógica para avanzar al siguiente paso del registro
-    setStage(1); // Avanza a la siguiente etapa
-  };
 
   const [prompts, setPrompts] = useState(false);
 
@@ -234,7 +194,6 @@ export default function Register() {
     setPrompts(true);
   };
 
-  const ValidateForm = async () => {};
 
   const handleContinue2 = () => {
     // Aquí puedes manejar la lógica para avanzar al siguiente paso del registro
@@ -282,30 +241,46 @@ export default function Register() {
     fetchPrompts();
   };
 
-  const handleReplyChange = (promptId: number, value: any) => {
+  const handleReplyChange = (promptId: number, value: string) => {
     setFormDetails((prevState) => {
+      console.log("%%%% ",formDetails.prompts)
+      // Buscar si el prompt ya existe en el estado
       const existingPromptIndex = prevState.prompts.findIndex(
-        (prompt) => prompt?.prompt_id === promptId
+        (prompt) => prompt?.prompt.id === promptId
       );
+  
+      // Crear una copia del arreglo de prompts y actualizar el campo reply
       const updatedPrompts =
         existingPromptIndex > -1
           ? prevState.prompts.map((prompt) =>
-              prompt?.prompt_id === promptId
-                ? { ...prompt, user_prompts_entity: { reply: value } }
+              prompt?.prompt.id === promptId
+                ? {
+                    ...prompt,
+                      ...prompt.user_prompts_entity,
+                      reply: value,
+                    }
                 : prompt
             )
           : [
               ...prevState.prompts,
-              { prompt_id: promptId, user_prompts_entity: { reply: value } },
+              {
+                prompt: {
+                  id: promptId,
+                  name: value, // Coloca el valor adecuado de `name` si lo tienes
+                },
+              },
             ];
-
+  
       console.log("Updated prompts:", updatedPrompts);
+  
+      // Retornar el nuevo estado con los prompts actualizados
       return {
         ...prevState,
         prompts: updatedPrompts,
       };
     });
   };
+  
   const GenericModal = ({ visible, onClose, children }: any) => (
     <Modal
       animationType="fade"
@@ -355,14 +330,15 @@ export default function Register() {
 
   const [agreeVisible, setAgreeVisible] = useState(false);
 
-  const upDatePrompsReplay = async () => { 
-    const transformedArray = formDetails.prompts.map(item => ({
-      prompt_id: item.prompt.id,  // 'id' de 'prompt' es el 'prompt_id'
-      reply: item.user_prompts_entity?.reply  || item.reply || ""    }));
-    console.log("format ",transformedArray)
+  const upDatePrompsReplay = async () => {
+    const transformedArray = formDetails.prompts.map((item) => ({
+      prompt_id: item.prompt.id, // 'id' de 'prompt' es el 'prompt_id'
+      reply: item.user_prompts_entity?.reply || item.reply || "",
+    }));
     const update = UpdatePromptsMe(transformedArray);
     if ((await update) === true) {
       console.log("EXITO UPDATE");
+
       setAgreeVisible(true);
     }
   };
@@ -383,7 +359,6 @@ export default function Register() {
         Accept: "application/json",
       };
 
-      console.log("Request body:", { prompts: promptsToSubmit });
 
       // Envía los prompts con sus respuestas al backend en el formato correcto y con los encabezados adecuados
       await axios.patch(
@@ -417,7 +392,30 @@ export default function Register() {
       ...prevState,
       [promptId]: !prevState[promptId],
     }));
+    if (textInputRefs.current[promptId]) {
+      textInputRefs.current[promptId].focus();
+    }
   };
+
+  const toggleDelete = async (promptId) => {
+    const deleted = await DeleteAttribute(promptId);
+
+    if (deleted === true) {
+      console.log("EXITO DELETE");
+
+      const updatedPrompts = promptsMe.filter(
+        (prompt) => prompt.id !== promptId
+      );
+      setPromptsMe(updatedPrompts);
+      console.log("Updated prompts:", updatedPrompts);
+
+      setFormDetails((prevDetails) => ({
+        ...prevDetails,
+        prompts: updatedPrompts,
+      }));
+    }
+  };
+  const textInputRefs = useRef({});
   const renderContent = () => {
     switch (stage) {
       case 1:
@@ -456,7 +454,6 @@ export default function Register() {
                   <>
                     {promptsMe?.map((prompt, index) => {
                       const getDynamicBackgroundColor = (index, reply) => {
-                        console.log(reply);
                         if (reply) {
                           return index % 2 === 0
                             ? isDarkMode
@@ -464,7 +461,7 @@ export default function Register() {
                               : colors.secondary.lighest
                             : colors.primary.lighest; // Rosa si es par, azul si es impar
                         }
-                        setValueText(prompt?.reply)
+                        setValueText(prompt?.reply);
                         return getBackgroundColor(index); // Mantiene el fondo original si no tiene reply
                       };
 
@@ -500,48 +497,50 @@ export default function Register() {
                                 paddingTop: 4,
                                 right: 5,
                               }}
-                              onPress={() => toggleEdit(prompt.prompt.id)}
+                              onPress={() => {
+                                toggleEdit(prompt.prompt.id);
+                              }}
                             >
                               <Edit color={theme.text} width={20} height={20} />
                             </TouchableOpacity>
                             <TouchableOpacity
                               style={{ paddingHorizontal: 0, paddingTop: 4 }}
-                              onPress={() =>
-                                handleOptionPressPropmpt(index, "")
-                              }
+                              onPress={() => toggleDelete(prompt.id)}
                             >
                               <Trash />
                             </TouchableOpacity>
                           </View>
-                          <TextInput
-                            style={[
-                              styles.inputprompt,
-                              {
-                                backgroundColor:
-                                  prompt?.reply === ""
-                                    ? theme.backgroundChat
-                                    : getDynamicBackgroundColor(
-                                        index,
-                                        prompt?.reply
-                                      ),
-                              },
-                            ]}
-                            
-                            placeholder={
-                              prompt?.reply ? (prompt?.reply) : ("Your answer")
-                            }
-                            editable={!!enableText[prompt.prompt.id]}
-                            placeholderTextColor={valueText == "Your answer"? theme.tertiary:theme.text}
-                            value={
-                              formDetails.prompts.find(
-                                (p) => p.prompt_id === prompt.prompt.id
-                              )?.user_prompts_entity?.reply || ""
-                            }
-                            onChangeText={(text) => {
-                              handleReplyChange(prompt.prompt.id, text);
-                            }}
-                            multiline
-                          />
+                          <View key={prompt.prompt.id}>
+                            <TextInput
+                              ref={(input) =>
+                                (textInputRefs.current[prompt.prompt.id] =
+                                  input)
+                              }
+                              style={[
+                                styles.inputprompt,
+                                {
+                                  backgroundColor:
+                                    prompt?.reply === ""
+                                      ? theme.backgroundChat
+                                      : getDynamicBackgroundColor(
+                                          index,
+                                          prompt?.reply
+                                        ),
+                                },
+                              ]}
+                              placeholder={"Your answer" }
+                              placeholderTextColor={theme.textDisable}
+                              value={
+                                formDetails.prompts.find(
+                                  (p) => p.prompt_id === prompt.prompt.id
+                                )?.reply 
+                              }
+                              onChangeText={(text) => {
+                                handleReplyChange(prompt.prompt.id, text);
+                              }}
+                              multiline
+                            />
+                          </View>
                         </View>
                       );
                     })}

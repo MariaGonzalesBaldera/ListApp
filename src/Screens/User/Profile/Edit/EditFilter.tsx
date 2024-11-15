@@ -34,7 +34,7 @@ export default function Register() {
   const [stage, setStage] = useState(1); // Estado para controlar la etapa del proceso de registro
   const navigation = useNavigation();
   const { theme } = useContext(ThemeContext);
-  const [listMe, setListMe] = useState([]);
+  const [list, setList] = useState([]);
   const [atributes, setAtributes] = useState([]);
   useEffect(() => {
     const fetchAtributes = async () => {
@@ -52,8 +52,13 @@ export default function Register() {
       try {
         const userData = await MeUser();
         setUser(userData.attributes);
-        setListMe(userData.attributes);
-        console.log("userData", userData.attributes);
+        setList(userData.attributes);
+        console.log("LIST", userData.attributes);
+        setFormDetails((prevFormData) => ({
+          ...prevFormData,
+          list: userData.attributes,
+        }));
+        console.log("$$$$ ", formDetails.list);
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -112,33 +117,41 @@ export default function Register() {
 
   const handleOptionPressMultiple = (attributeId: number) => {
     const updatedFormDetails = { ...formDetails };
+  
+    // Busca si el atributo ya está en la lista
     const existingAttribute = updatedFormDetails.list.find(
-      (item) => item.attribute_id === attributeId
+      (item) => item.id === attributeId
     );
+  
     if (existingAttribute) {
+      // Si ya existe, elimínalo de la lista
       updatedFormDetails.list = updatedFormDetails.list.filter(
-        (item) => item.attribute_id !== attributeId
+        (item) => item.id !== attributeId
       );
-      updatedFormDetails.list.forEach((item, index) => {
-        item.priority = index + 1;
-      });
     } else {
+      // Solo agrega un nuevo atributo si la lista tiene menos de 3 elementos
       if (updatedFormDetails.list.length < 3) {
         updatedFormDetails.list.push({
-          attribute_id: attributeId,
-          priority: updatedFormDetails.list.length + 1,
+          id: attributeId,
+          UsersAttributesEntity: {
+            priority: updatedFormDetails.list.length + 1,
+          },
         });
       } else {
         // Si ya hay 3 seleccionados, no hacemos nada
         return;
       }
     }
-
-    // Añadimos un console.log para ver la lista actualizada de atributos
-    console.log("Atributos seleccionados:", updatedFormDetails.list);
-    // Actualizamos el estado con los detalles actualizados
+  
+    // Reasigna `priority` para mantenerlo secuencial del 1 al 3
+    updatedFormDetails.list.forEach((item, index) => {
+      item.UsersAttributesEntity.priority = index + 1;
+    });
+  
+    // Actualiza el estado con el nuevo `updatedFormDetails`
     setFormDetails(updatedFormDetails);
   };
+  
   const handleOptionPress = (field: any, value: any) => {
     setFormDetails((prevState) => ({
       ...prevState,
@@ -201,9 +214,14 @@ export default function Register() {
   const [agreeVisible, setAgreeVisible] = useState(false);
 
   const ValidateForm = async () => {
-    const Create = UpdateAttributes(
-      formDetails.list
-    );
+    const transformedData = {
+      attributes: formDetails.list.map(item => ({
+        attribute_id: item.id,
+        priority: item.UsersAttributesEntity.priority
+      }))
+    };
+
+    const Create = UpdateAttributes(transformedData);
     if ((await Create) === true) {
       console.log("EXITO UPDATE");
       setAgreeVisible(true);
@@ -251,7 +269,7 @@ export default function Register() {
         >
           {atributes?.length > 0 ? (
             atributes?.map((attribute, index) => {
-              const selectedIds = listMe.map((item) => item.id);
+              const selectedIds = formDetails.list.map((item) => item.id);
               const isSelected = selectedIds.includes(attribute.id);
               const isDisabled = formDetails.list.length >= 3 && !isSelected;
 
@@ -267,8 +285,7 @@ export default function Register() {
                     }, // Estilo de deshabilitado si ya hay 3 seleccionados
                   ]}
                   onPress={() =>
-                    !isDisabled &&
-                    handleOptionPressMultiple(Number(attribute.id))
+                    !isDisabled && handleOptionPressMultiple(attribute.id)
                   }
                   disabled={isDisabled}
                 >
@@ -300,8 +317,9 @@ export default function Register() {
                     >
                       <Text style={styles.number}>
                         {
-                          listMe.find((item) => item.id === attribute.id)
-                            ?.UsersAttributesEntity?.priority
+                          formDetails.list.find(
+                            (item) => item.id === attribute.id
+                          )?.UsersAttributesEntity?.priority
                         }
                       </Text>
                     </View>
@@ -659,10 +677,9 @@ const styles = StyleSheet.create({
     color: colors.neutral.darkest,
   },
   bannerContainer: {
-    paddingTop:10,
+    paddingTop: 10,
     height: 90,
     width: "100%",
     marginBottom: 0,
-    
   },
 });
